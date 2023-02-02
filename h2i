@@ -1,18 +1,25 @@
 #!/bin/bash
 
-# h2i - homematic two influx
+# title           : h2i - homematic two influx
+# description     : Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
+# author		      : Torsten Scholz (https://github.com/TorstenScholz/h2i)
+# License         : GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+# date            : 02.02.2023
+# version         : 1.1.0    
+# usage		        : h2i [command] [option]
+# notes           : Linux tools: curl, awk, cut, sed and xmllint must be installed.
 
 
 # Define Variables
 PROGRAM="h2i"
 VERSION="1.1.0"
 error=""
-ccudata="homematic.data"                                      
-statelist="statelist.xml"                                     
-ccu="http://192.168.0.20/addons/xmlapi/statelist.cgi"      
-#db_user="admin"                                              
-#db_pass="*********"                                          
-#db_url="http://localhost:8086/write?db=grafana"              
+ccudata="homematic.data"                                      # Path and filename for ccu.data file
+statelist="statelist.xml"                                     # Path and filename for statelist.xml file
+ccu="http://192.168.0.20/addons/xmlapi/statelist.cgi"         # URL where statelist.xml can be pulled from
+#db_user="admin"                                              # User of influxdb
+#db_pass="*********"                                          # Passord of influxdb
+#db_url="http://localhost:8086/write?db=grafana"              # URL of influxdb with port and database 
 
 
 # Set Enviroment
@@ -25,6 +32,10 @@ echo -n "" > $ccudata
 
 
 # List of ise_ids and values to parse from statelist.xml
+# FORMAT: ise_id,type1,type2,type3,...
+# EXAMPLE: 6456,SET_TEMPERATURE,ACTUAL_TEMPERATURE,VALVE_STATE,BATTERY_STATE
+# HINT: No empty line at the beginnig or end. First the ID then the values separated by commas.
+
 list_of_ids="6123,SET_TEMPERATURE,ACTUAL_TEMPERATURE,ACTUAL_HUMIDITY,BATTERY_STATE,LOWBAT
 3564,ENERGY_COUNTER,POWER,CURRENT,VOLTAGE,FREQUENCY,STATE
 7846,ACTUAL_TEMPERATURE,HUMIDITY,ILLUMINATION,RAIN_COUNTER,SUNSHINEDURATION,WIND_DIR,WIND_DIR_RANGE,WIND_SPEED,LOW_BAT
@@ -195,3 +206,4 @@ unset end
 
 # Exit
 exit 0
+
