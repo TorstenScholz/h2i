@@ -1,6 +1,16 @@
 # h2i
 Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
 
+# ToDo
+- Write readme.md with install and use instructions.
+- Check enviroment for needed programs and give sugesstions on how to install them.
+- Command for getting and showing available device ids and types.
+
+# Changelog
+1.1.0 Code documentation
+1.0.0 Initial Version with basic feature set
+
+
 # Licence
 GNU LGPLv3
 
