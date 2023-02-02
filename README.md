@@ -4,12 +4,14 @@ Pull data from homematic ccu via xmlapi and stores them inside a time series dat
 ## ToDo
 - Write readme.md with install and use instructions.
 - Check enviroment for needed programs and give sugesstions on how to install them.
-- Command for getting and showing available device ids and types.
+- Add list command for getting and showing available device ids and types.
 
 ## Changelog
-1.1.0 Code documentation
+1.2.0 Check enviroment for needed programs and give sugesstions on how to install them.
 
-1.0.0 Initial Version with basic feature set
+1.1.0 Code documentation.
+
+1.0.0 Initial Version with basic feature set.
 
 
 ## Licence
