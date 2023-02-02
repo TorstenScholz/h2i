@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# h2i - homematic two influx
+
+
+# Define Variables
+PROGRAM="h2i"
+VERSION="1.1.0"
+error=""
+ccudata="homematic.data"                                      
+statelist="statelist.xml"                                     
+ccu="http://192.168.0.20/addons/xmlapi/statelist.cgi"      
+#db_user="admin"                                              
+#db_pass="*********"                                          
+#db_url="http://localhost:8086/write?db=grafana"              
+
+
+# Set Enviroment
+xmllint="/usr/bin/$xmllint"
+curl="/usr/bin/curl"
+awk="/usr/bin/awk"
+cut="/usr/bin/cut"
+sed="/bin/sed"
+echo -n "" > $ccudata
+
+
+# List of ise_ids and values to parse from statelist.xml
+list_of_ids="6123,SET_TEMPERATURE,ACTUAL_TEMPERATURE,ACTUAL_HUMIDITY,BATTERY_STATE,LOWBAT
+3564,ENERGY_COUNTER,POWER,CURRENT,VOLTAGE,FREQUENCY,STATE
+7846,ACTUAL_TEMPERATURE,HUMIDITY,ILLUMINATION,RAIN_COUNTER,SUNSHINEDURATION,WIND_DIR,WIND_DIR_RANGE,WIND_SPEED,LOW_BAT
+2422,STATE,LOWBAT"
+
+
+# Function: Get statelist.xml
+get_statelist () {
+  $curl -s $ccu -o $statelist
+}
+
+
+# Function: Parsing XML data
+parse_xml () {
+  device_id=$1
+  device_type=$2
+  xpath="(//device[@ise_id="$device_id"]/channel/datapoint[@type='$device_type'])[1]"
+
+  # Test if device and type exist in xml
+  if ! $xmllint --xpath //device[@ise_id="$device_id"] $statelist > /dev/null; then
+    # Device not found in xml
+    echo "ERROR: Device name: "$device_id" not found in xml"
+    exit 1
+    
+  elif ! $xmllint --xpath $xpath "$statelist" > /dev/null; then
+    # Type not found in xml
+    echo "ERROR: Device type: "$device_type" not found in xml"
+    exit 1
+    
+  else
+    # Parse data into variables 
+    name=`$xmllint --xpath //device[@ise_id="$device_id"] "$statelist" | $awk -F= '$1=="name"{print $2}' RS=' ' | $sed -n "1p"  | $sed 's/^"//;s/"$//'`
+    id=`xmllint --xpath $xpath "$statelist" | awk -F= '$1=="ise_id"{print $2}' RS=' ' | sed 's/^"//;s/"$//'`
+    channel=`$xmllint --xpath //datapoint[@ise_id="$id"] "$statelist" | $awk -F= '$1=="name"{print $2}' RS=' ' | $cut -d ":" -f 2 | $cut -d "." -f 1`
+    serial=`$xmllint --xpath //datapoint[@ise_id="$id"] "$statelist" | $awk -F= '$1=="name"{print $2}' RS=' ' | $cut -d ":" -f 1 | $cut -d "." -f 2`
+    type=`$xmllint --xpath //datapoint[@ise_id="$id"] "$statelist" | $awk -F= '$1=="name"{print $2}' RS=' ' | $cut -d ":" -f 2 | $cut -d "." -f 2 | $sed 's/^"//;s/"$//'`
+    value=`$xmllint --xpath //datapoint[@ise_id="$id"] "$statelist" | $awk -F= '$1=="value"{print $2}' RS=' ' | $sed 's/^"//;s/"$//'`
+
+
+    # Convert boolean values 
+    if [ "$value" = "false" ]; then
+      value="0"
+    elif [ "$value" = "true" ]; then
+      value="1"
+    fi 
+
+
+    # Write data to ccudata file
+    echo "homematic=ccu1,name=$name,channel=$channel,serial=$serial,ise_id=$id,type=$type value=$value" >> $ccudata
+  fi
+}
+
+
+# Main Loop
+# Get comand + option and work accordingly
+COMMAND="$1"
+OPTION="$2"
+
+case $COMMAND in
+  version | -v | --version)
+    echo "$PROGRAM $VERSION"
+  ;;
+
+  pull | -p | --pull)
+    # Start time measurement
+    start=$(date +%s)  
+
+
+    # Get statelist from ccu
+    echo -n "Receiving statelist.xml... "
+    get_statelist
+    echo "done"
+
+
+    # Get data from id.list
+    echo -n "Parsing data"
+    devices=`echo "$list_of_ids" | $sed $= -n`
+
+
+    # Read list of IDs and call xml parser with device id and given element
+    while read LINE; do
+      IFS=','
+      read -r -a array_of_ids <<< "$LINE"
+      id_from_list="${array_of_ids[0]}"
+      for element_from_list in "${array_of_ids[@]:1}"; do
+        parse_xml $id_from_list $element_from_list
+        echo -n "."
+      done
+    done <<< $(echo "$list_of_ids")
+    echo " done"
+
+
+    # Store data in time series database
+    echo -n "Writing to influxDB... "
+    $curl -i -XPOST -u $db_user:$db_pass "$db_url" --data-binary @$ccudata
+    echo "done"
+
+
+    # Calculate devices, values and needed time
+    values=`$sed $= -n $ccudata`
+    end=$(date +%s)
+    echo "Computed: "$devices "devices with: "$values "values in: "$((end - $start)) "seconds"
+
+
+    # Debug option
+    if [ "$OPTION" = "debug" ]; then
+      echo ""
+      echo "DEBUG INFO:"
+      cat $ccudata
+    fi
+    
+    echo "No error"
+  ;;
+
+  *)
+    echo "$PROGRAM v$VERSION"
+    echo " Pulls data from a homematic ccu via xmlapi and stores them inside a time series database like influxdb."
+    echo " Configuration is done inside this script."
+    echo ""
+    echo "Usage:"
+    echo " $PROGRAM [command] [option]"
+    echo ""
+    echo "Available Commands:"
+    echo " version        Print version information"
+    echo " help           Print this help message"
+    echo " pull           Gets values from given device ids"
+    echo ""
+    echo "Available Options:"
+    echo " debug          Enables Debug informations"
+  ;;
+esac
+
+# Clean up
+unset PROGRAM
+unset VERSION
+unset error
+unset ccudata
+unset statelist
+unset ccu
+unset db_user
+unset db_pass
+unset db_url
+unset xmllint
+unset curl
+unset awk
+unset cut
+unset sed
+unset list_of_ids
+unset device_id
+unset device_type
+unset xpath
+unset name
+unset id
+unset channel
+unset serial
+unset type
+unset value
+unset COMMAND
+unset OPTION
+unset start
+unset devices
+unset IFS
+unset array_of_ids
+unset id_from_list
+unset element_from_list
+unset values
+unset end
+
+# Exit
+exit 0
