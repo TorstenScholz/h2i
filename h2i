@@ -4,19 +4,19 @@
 # description     : Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
 # author          : Torsten Scholz (https://github.com/TorstenScholz/h2i)
 # License         : GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
-# date            : 02.02.2023
-# version         : 1.2.0
+# date            : 04.02.2023
+# version         : 1.2.1
 # usage           : h2i [command] [option]
 # notes           : Linux tools: xmllint, curl, awk, cut and sed must be installed.
 
 
 # Define Variables
 PROGRAM="h2i"
-VERSION="1.2.0"
+VERSION="1.2.1"
 error=""
 ccudata="homematic.data"                                      # Path and filename for ccu.data file
 statelist="statelist.xml"                                     # Path and filename for statelist.xml file
-ccu="http://192.168.2.20/addons/xmlapi/statelist.cgi"         # URL where statelist.xml can be pulled from
+ccu="http://192.168.0.20/addons/xmlapi/statelist.cgi"         # URL where statelist.xml can be pulled from
 db_user="admin"                                               # User of influxdb
 db_pass="*********"                                           # Passord of influxdb
 db_url="http://localhost:8086/write?db=h2i"                   # URL of influxdb with port and database 
@@ -44,7 +44,18 @@ list_of_ids="6123,SET_TEMPERATURE,ACTUAL_TEMPERATURE,ACTUAL_HUMIDITY,BATTERY_STA
 
 # Function: Get statelist.xml
 get_statelist () {
-  $curl -s $ccu -o $statelist
+
+  # Test if connection to ccu can be made
+  if ! $curl -s --head --connect-timeout 1 $ccu | grep "200" > /dev/null; then
+    # No connection to ccu 
+    echo ""
+    echo "ERROR: Connection to $ccu not possible. Verify that address of ccu is correct and reachable."
+    exit 1
+
+  else
+    # connect to ccu und get statelist
+    $curl -s $ccu -o $statelist
+  fi
 }
 
 
@@ -55,13 +66,15 @@ parse_xml () {
   xpath="(//device[@ise_id="$device_id"]/channel/datapoint[@type='$device_type'])[1]"
 
   # Test if device and type exist in xml
-  if ! $xmllint --xpath //device[@ise_id="$device_id"] $statelist > /dev/null; then
+  if ! $xmllint --xpath //device[@ise_id="$device_id"] $statelist > /dev/null 2>&1; then
     # Device not found in xml
+    echo ""
     echo "ERROR: Device name: "$device_id" not found in xml"
     exit 1
 
-  elif ! $xmllint --xpath $xpath "$statelist" > /dev/null; then
+  elif ! $xmllint --xpath $xpath "$statelist" > /dev/null 2>&1; then
     # Type not found in xml
+    echo ""
     echo "ERROR: Device type: "$device_type" not found in xml"
     exit 1
 
@@ -130,7 +143,7 @@ case $COMMAND in
 
     # Store data in time series database
     echo -n "Writing to influxDB... "
-    $curl -i -XPOST -u $db_user:$db_pass "$db_url" --data-binary @$ccudata
+    $curl -s -i -XPOST -u $db_user:$db_pass "$db_url" --data-binary @$ccudata > /dev/null 
     echo "done"
 
 
@@ -169,6 +182,8 @@ case $COMMAND in
 esac
 
 # Clean up
+rm $statelist
+
 unset PROGRAM
 unset VERSION
 unset error
@@ -203,6 +218,7 @@ unset id_from_list
 unset element_from_list
 unset values
 unset end
+
 
 # Exit
 exit 0
