@@ -31,6 +31,11 @@ Available Options:
   debug, -d, --debug         - Enables Debug informations  
 </pre>
 
+## Device list
+Getting the device list of your devices can be done by the following comand line. In further versions of h2i I will build in the `list` command for this.
+
+`curl -s http://homematic/addons/xmlapi/statelist.cgi | xmllint --xpath //device > devices.xml -`
+
 ## Visualisation
 In grafana you can use the group by option to get all values of one type into on graph with just one db query.  
 
