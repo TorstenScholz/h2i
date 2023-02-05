@@ -149,6 +149,7 @@ case $COMMAND in
     # Store data in time series database
     echo -n "Writing to influxDB... "
     $curl -s -i -XPOST -u $db_user:$db_pass "$db_url" --data-binary @$ccudata > /dev/null 
+    rm $statelist
     echo "done"
 
 
@@ -177,18 +178,16 @@ case $COMMAND in
     echo " $PROGRAM [command] [option]"
     echo ""
     echo "Available Commands:"
-    echo " version        Print version information"
-    echo " help           Print this help message"
-    echo " pull           Gets values from given device ids"
+    echo " version, -v, --version     - Print version information"
+    echo " help, -h, --help           - Print this help message"
+    echo " pull, -p, --pull           - Gets values from given device ids"
     echo ""
     echo "Available Options:"
-    echo " debug          Enables Debug informations"
+    echo " debug, -d, --debug         - Enables Debug informations"
   ;;
 esac
 
 # Clean up
-rm $statelist
-
 unset PROGRAM
 unset VERSION
 unset error
