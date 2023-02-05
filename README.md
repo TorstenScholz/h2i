@@ -2,7 +2,7 @@
 Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
 
 ## Install
-Easy and strait forward. Just 3 steps are neede:
+Easy and strait forward. Just 3 steps are needed:
 1. Download and unpack the zip file or clone the git repository.
 2. Edit the settings section of h2i file with you desired program editor.
 3. Move the h2i file to /usr/local/bin.
