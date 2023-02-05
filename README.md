@@ -9,16 +9,18 @@ Easy and strait forward. Just 3 steps are neede:
 Now h2i is ready to use.
 
 ## Use
+<pre>
 Usage:  
- h2i [command] [option]  
+  h2i [command] [option]  
 
 Available Commands:  
- version        Print version information  
- help           Print this help message  
- pull           Gets values from given device ids  
+  version, -v, --version     - Print version information  
+  help, -h, --help           - Print this help message  
+  pull, -p, --pull           - Gets values from given device ids  
 
 Available Options:  
- debug          Enables Debug informations  
+  debug, -d, --debug         - Enables Debug informations  
+</pre>
 
 ## ToDo
 * Update README with install and use instructions. Write short info on how to use group by function in grafana for getting all values of one type.
