@@ -39,11 +39,11 @@ In grafana you can use the group by option to get all values of one type into on
 ![h2i grafana query mit group by option](doc/h2i_grafana_query.png)
 
 ## ToDo
-* Add 'list' command for getting and showing available device ids and types.
+* Add `list` command for getting and showing available device ids and types.
 * Use GNU parallel to speed up the parsing process if avaiable.
 * Outsource settings and list of id's into a separate file.
-* Add 'install' and 'update' command.
-* Add option for 'silent-run' and 'dry-run'.
+* Add `install` and `update` command.
+* Add option for `silent-run` and `dry-run`.
 
 ## Changelog
 1.2.2
