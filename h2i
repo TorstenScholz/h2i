@@ -4,32 +4,18 @@
 # description     : Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
 # author          : Torsten Scholz (https://github.com/TorstenScholz/h2i)
 # License         : GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
-# date            : 04.02.2023
-# version         : 1.2.1
+# date            : 05.02.2023
+# version         : 1.2.5
 # usage           : h2i [command] [option]
 # notes           : Linux tools: xmllint, curl, awk, cut and sed must be installed.
 
-
-# Define Variables
-PROGRAM="h2i"
-VERSION="1.2.1"
-error=""
-ccudata="homematic.data"                                      # Path and filename for ccu.data file
-statelist="statelist.xml"                                     # Path and filename for statelist.xml file
-ccu="http://192.168.0.20/addons/xmlapi/statelist.cgi"         # URL where statelist.xml can be pulled from
+# Settings
+ccudata="/tmp/homematic.data"                                 # Path and filename for ccu.data file
+statelist="/tmp/statelist.xml"                                # Path and filename for statelist.xml file
+ccu="http://homematic/addons/xmlapi/statelist.cgi"            # URL where statelist.xml can be pulled from
 db_user="admin"                                               # User of influxdb
 db_pass="*********"                                           # Passord of influxdb
 db_url="http://localhost:8086/write?db=h2i"                   # URL of influxdb with port and database 
-
-
-# Set Enviroment
-xmllint=`command -v xmllint` || { echo "I require 'xmllint' but it's not installed. Use your package manager to install it or visit 'http://www.xmlsoft.org'. Aborting."; exit 1; }
-curl=`command -v curl` || { echo "I require 'curl' but it's not installed. Use your package manager to install it or visit 'https://curl.se'. Aborting."; exit 1; }
-awk=`command -v awk` || { echo "I require 'awk' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
-cut=`command -v cut` || { echo "I require 'cut' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
-sed=`command -v sed` || { echo "I require 'sed' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
-echo -n "" > $ccudata
-
 
 # List of ise_ids and values to parse from statelist.xml
 # FORMAT: ise_id,type1,type2,type3,...
@@ -41,6 +27,25 @@ list_of_ids="6123,SET_TEMPERATURE,ACTUAL_TEMPERATURE,ACTUAL_HUMIDITY,BATTERY_STA
 3564,ENERGY_COUNTER,POWER,CURRENT,VOLTAGE,FREQUENCY,STATE
 7846,ACTUAL_TEMPERATURE,HUMIDITY,ILLUMINATION,RAIN_COUNTER,SUNSHINEDURATION,WIND_DIR,WIND_DIR_RANGE,WIND_SPEED,LOW_BAT
 6185,STATE,LOWBAT"
+
+
+# No need to change anything below this line.
+
+
+# Define Variables
+PROGRAM="h2i"
+VERSION="1.2.2"
+error=""
+
+
+# Set Enviroment
+xmllint=`command -v xmllint` || { echo "I require 'xmllint' but it's not installed. Use your package manager to install it or visit 'http://www.xmlsoft.org'. Aborting."; exit 1; }
+curl=`command -v curl` || { echo "I require 'curl' but it's not installed. Use your package manager to install it or visit 'https://curl.se'. Aborting."; exit 1; }
+awk=`command -v awk` || { echo "I require 'awk' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
+cut=`command -v cut` || { echo "I require 'cut' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
+sed=`command -v sed` || { echo "I require 'sed' but it's not installed. Use your package manager to install it. Aborting."; exit 1; }
+echo -n "" > $ccudata
+
 
 # Function: Get statelist.xml
 get_statelist () {
