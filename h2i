@@ -5,7 +5,7 @@
 # author          : Torsten Scholz (https://github.com/TorstenScholz/h2i)
 # License         : GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 # date            : 05.02.2023
-# version         : 1.2.5
+# version         : 1.2.2
 # usage           : h2i [command] [option]
 # notes           : Linux tools: xmllint, curl, awk, cut and sed must be installed.
 
@@ -29,7 +29,7 @@ list_of_ids="6123,SET_TEMPERATURE,ACTUAL_TEMPERATURE,ACTUAL_HUMIDITY,BATTERY_STA
 6185,STATE,LOWBAT"
 
 
-# No need to change anything below this line.
+# No need to change anything below this line. #################
 
 
 # Define Variables
