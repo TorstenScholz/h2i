@@ -6,7 +6,16 @@ Easy and strait forward. Just 3 steps are neede:
 1. Download and unpack the zip file or clone the git repository.
 2. Edit the settings section of h2i file with you desired program editor.
 3. Move the h2i file to /usr/local/bin.
+
 Now h2i is ready to use.
+
+You can use the folowing short script to call h2i every minute from cron. Just place the follwing script at /etc/daily.d/h2i. Don't forget to replace [user] with the user name you want to run the script with.
+
+<pre>
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+* * * * * [user] /usr/local/bin/h2i pull >/dev/null 2>&1
+</pre>
 
 ## Use
 <pre>
