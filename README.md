@@ -9,7 +9,7 @@ Easy and strait forward. Just 3 steps are needed:
 
 Now h2i is ready to use.
 
-You can use the folowing short script to call h2i every minute from cron. Just place the follwing script at /etc/daily.d/h2i. Don't forget to replace [user] with the user name you want to run the script with.
+You can use the folowing short script to call h2i every minute from cron. Just place the follwing script at /etc/cron.d/h2i. Don't forget to replace [user] with the user name you want to run the script with.
 
 <pre>
 SHELL=/bin/bash
