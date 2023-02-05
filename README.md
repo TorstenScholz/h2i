@@ -31,13 +31,19 @@ Available Options:
   debug, -d, --debug         - Enables Debug informations  
 </pre>
 
+## Visualisation
+In grafana you can use the group by option to get all values of one type into on graph with just one db query.  
+
+`SELECT mean("value") FROM "homematic=ccu1" WHERE ("type" = 'ACTUAL_TEMPERATURE') AND $timeFilter GROUP BY time($__interval), "name" fill(null)`
+
+![h2i grafana query mit group by option](doc/h2i_grafana_query.png)
+
 ## ToDo
-* Update README with install and use instructions. Write short info on how to use group by function in grafana for getting all values of one type.
-* Add list command for getting and showing available device ids and types.
+* Add 'list' command for getting and showing available device ids and types.
 * Use GNU parallel to speed up the parsing process if avaiable.
 * Outsource settings and list of id's into a separate file.
-* Add install/update command.
-* Add option for silent-run and dry-run.
+* Add 'install' and 'update' command.
+* Add option for 'silent-run' and 'dry-run'.
 
 ## Changelog
 1.2.2
