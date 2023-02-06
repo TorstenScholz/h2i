@@ -36,6 +36,18 @@ Getting the device list of your devices can be done by the following comand line
 
 `curl -s http://homematic/addons/xmlapi/statelist.cgi | xmllint --xpath //device > devices.xml -`
 
+In the `settings` chapter of h2i you need to set the list_of_ids in the following format:
+<pre>
+FORMAT: ise_id,type1,type2,type3,...
+
+EXAMPLE: 
+6456,SET_TEMPERATURE,ACTUAL_TEMPERATURE,VALVE_STATE,BATTERY_STATE
+2469,SET_TEMPERATURE,ACTUAL_TEMPERATURE,VALVE_STATE,BATTERY_STATE,LOWBAT
+3564,ENERGY_COUNTER,POWER,CURRENT,VOLTAGE,FREQUENCY,STATE
+7846,ACTUAL_TEMPERATURE,HUMIDITY,ILLUMINATION,RAIN_COUNTER,SUNSHINEDURATION,WIND_DIR,WIND_DIR_RANGE,WIND_SPEED,LOW_BAT
+6185,STATE,LOWBAT
+</pre>
+
 ## Visualisation
 In grafana you can use the group by option to get all values of one type into on graph with just one db query.  
 
