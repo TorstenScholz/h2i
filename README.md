@@ -48,6 +48,19 @@ EXAMPLE:
 6185,STATE,LOWBAT
 </pre>
 
+## Influxdb
+For every defined type of the given device id the following informations are stored inside the influxdb.
+<pre>
+EXAMPLE:
+homematic=ccu1,
+channel=1,
+ise_id=7873,
+name=WS-Garten-Wetterstation,
+serial=00185F298DB5BB,
+type=ACTUAL_TEMPERATURE
+value=6.000
+</pre>
+
 ## Visualisation
 In grafana you can use the group by option to get all values of one type into on graph with just one db query.  
 
