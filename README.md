@@ -2,6 +2,8 @@
 Pull data from homematic ccu via xmlapi and stores them inside a time series database like influxdb.
 
 ## Install
+Pre requirements are the following Linux tools: `xmllint`, `curl`, `awk`, `cut` and `sed`. 
+
 Easy and strait forward. Just 3 steps are needed:
 1. Download and unpack the zip file or clone the git repository.
 2. Edit the settings section of h2i file with you desired program editor.
@@ -49,6 +51,10 @@ EXAMPLE:
 </pre>
 
 ## Influxdb
+Setting up the h2i database in influxdb can be done with the follwing command.
+
+`$ curl --user admin:password -XPOST 'http://localhost:8086/query' --data-urlencode 'q=CREATE DATABASE "h2i"'`
+
 For every defined type of the given device id the following informations are stored inside the influxdb.
 <pre>
 EXAMPLE:
